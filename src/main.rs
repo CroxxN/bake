@@ -87,6 +87,10 @@ fn compile_file() {
         match run_output {
             Ok(o) => {
                 if let Some(code) = o.code() {
+                    if code != 0 {
+                        println!("Failed to run. Exited with status: {}", code);
+                        return;
+                    }
                     println!("\n\nProgram exited with status {}", code)
                 }
             }
