@@ -27,12 +27,12 @@ fn main() {
     } else {
         match args.file {
             Some(_file) => generate_usaco_template(_file),
-            None => compile_file(),
+            None => start_comp_o_run(),
         }
     }
 }
 
-fn compile_file() {
+fn start_comp_o_run() {
     let entries: Vec<fs::DirEntry> = fs::read_dir(".")
         .expect("couldn't read the directory")
         .filter(|f| {
@@ -56,7 +56,15 @@ fn compile_file() {
             .to_str()
             .expect("Failed to convert the osstr to str")
             .trim_matches('"');
-        println!("\nCompiling {} with g++", file_name);
+        if file_name.contains(".cpp") {
+            compile_and_run(file_name);
+        } else {
+            run_exec(file_name);
+        }
+    }
+
+    fn compile_and_run<'a>(file_name: &'a str) {
+        println!("\nCompiling {} with g++...", file_name);
         let compile_output = Command::new("g++")
             .arg(format!("{}", file_name))
             .arg("-o")
@@ -82,8 +90,12 @@ fn compile_file() {
                 return;
             }
         }
-        println!("\nRunning {}\n", file_name);
-        let run_output = Command::new(format!("./{}", file_name.trim_end_matches(".cpp"))).status();
+        run_exec(file_name.trim_end_matches(".cpp"));
+    }
+
+    fn run_exec<'a>(file_name: &'a str) {
+        println!("\nRunning exec {}...\n", file_name);
+        let run_output = Command::new(format!("./{}", file_name)).status();
         match run_output {
             Ok(o) => {
                 if let Some(code) = o.code() {
@@ -96,8 +108,6 @@ fn compile_file() {
             }
             Err(e) => println!("{e}"),
         }
-    } else {
-        println!("Failed to compile the file");
     }
 }
 
