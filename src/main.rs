@@ -12,15 +12,15 @@ struct Args {
     file: Option<String>,
     #[arg(short = 't')]
     template: bool,
-    #[arg(short = 'e')]
-    edit: bool,
+    // #[arg(short = 'e')]
+    // edit: bool,
 }
 
 fn main() {
     let args = Args::parse();
-    if args.edit {
-        temp_file_handle(None);
-    }
+    // if args.edit {
+    //     temp_file_handle(None);
+    // }
     if args.template {
         match args.file {
             Some(_file) => generice_cpp(_file),
@@ -33,30 +33,6 @@ fn main() {
         match args.file {
             Some(_file) => generate_usaco_template(_file),
             None => start_comp_o_run(),
-        }
-    }
-}
-
-fn temp_file_handle<'a>(num: Option<&'a str>) {
-    match num {
-        None => match fs::read_to_string("/tmp/bake") {
-            Ok(content) => {
-                _ = Command::new("hx")
-                    .args(["-c", "~/.config/helix/config.toml", &content])
-                    .status();
-            }
-            Err(e) => {
-                fs::File::create("/tmp/bake").expect_err("Error expect_err");
-            }
-        },
-        Some(s) => {
-            let mut file = if let Ok(f) = fs::File::open("/tmp/bake") {
-                f
-            } else {
-                println!("A error occured in writing to the file");
-                return;
-            };
-            file.write_fmt(format_args!("{s}"));
         }
     }
 }
@@ -141,7 +117,7 @@ fn start_comp_o_run() {
 }
 
 fn generice_cpp(file: String) {
-    temp_file_handle(Some(&file));
+    // temp_file_handle(Some(&file));
     let file_name = format!("{}.cpp", file);
     let curr_time = match time::SystemTime::now().duration_since(UNIX_EPOCH) {
         Ok(dur) => dur,
@@ -173,6 +149,7 @@ int main(){{
         println!("{} occured", e);
         return;
     }
+    Command::new("helix").arg(&file_name).status().unwrap();
 }
 
 fn generate_usaco_template(file: String) {
